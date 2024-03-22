@@ -1,6 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
 
-@Controller("users")
+@Controller('users')
 export class UserController {
   @Post()
   async create(@Body() body) {
@@ -10,25 +19,25 @@ export class UserController {
   @Get()
   async readAll() {
     return {
-      users: []
+      users: [],
     };
   }
 
-  @Get(":id")
+  @Get(':id')
   async readOne(@Param() param) {
     return {
       user: {},
-      param
+      param,
     };
   }
 
-@Put(':id')
+  @Put(':id')
   async update(@Body() body, @Param() params) {
     return {
       method: 'Put',
       body,
-      params
-    }
+      params,
+    };
   }
 
   @Patch(':id')
@@ -36,15 +45,15 @@ export class UserController {
     return {
       method: 'Patch',
       body,
-      params
-    }
+      params,
+    };
   }
 
   @Delete(':id')
   async deleteOne(@Param() param) {
     return {
       method: 'Delete',
-      param
-    }
+      param,
+    };
   }
 }
