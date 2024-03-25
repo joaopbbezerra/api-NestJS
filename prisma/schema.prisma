@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  name      String   @db.VarChar(63)
+  email     String   @unique(map: "email_UNIQUE") @db.VarChar(127)
+  password  String   @db.VarChar(127)
+  birthAt   DateTime?   @db.Date
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+
+  //Since modified the model name (From users to Use) we need to inform prism which table is this, and we inform it like that:
+  @@map("users")
+}
+
+//npx prisma migrate dev --name AddBirthAt -> To add a new column
+//Remember to run npx prisma generate otherwise we won't have the new column in the auto complete
+//Remember that it creates the table all over again, so we lose all data

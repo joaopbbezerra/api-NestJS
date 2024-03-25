@@ -12,27 +12,24 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
   @Post()
-  async create(@Body() body: CreateUserDto) {
-    return { body };
+  async create(@Body() data: CreateUserDto) {
+    return this.userService.create(data);
   }
 
   @Get()
   async readAll() {
-    return {
-      users: [],
-    };
+    return this.userService.list();
   }
 
   @Get(':id')
   async readOne(@Param('id', ParseIntPipe) id: number) {
-    return {
-      user: {},
-      id,
-    };
+    return this.userService.findOne(id);
   }
 
   @Put(':id')
@@ -40,11 +37,8 @@ export class UserController {
     @Body() body: UpdatePutUserDto,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return {
-      method: 'Put',
-      body,
-      id,
-    };
+    //If something is undefined, it won't be updated
+    return this.userService.update(body, id);
   }
 
   @Patch(':id')
@@ -52,18 +46,11 @@ export class UserController {
     @Body() body: UpdatePatchUserDto,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return {
-      method: 'Patch',
-      body,
-      id,
-    };
+    return this.userService.partialUpdate(body, id);
   }
 
   @Delete(':id')
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
-    return {
-      method: 'Delete',
-      id,
-    };
+    return this.userService.delete(id);
   }
 }
