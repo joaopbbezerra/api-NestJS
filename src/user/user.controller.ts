@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
 import { UserService } from './user.service';
+import { ParamId } from '../decorators/param-id.decorator';
 
 @Controller('users')
 export class UserController {
@@ -29,24 +30,18 @@ export class UserController {
   }
 
   @Get(':id')
-  async readOne(@Param('id', ParseIntPipe) id: number) {
+  async readOne(@ParamId() id: number) {
     return this.userService.findOne(id);
   }
 
   @Put(':id')
-  async update(
-    @Body() body: UpdatePutUserDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async update(@Body() body: UpdatePutUserDto, @ParamId() id: number) {
     //If something is undefined, it won't be updated
     return this.userService.update(body, id);
   }
 
   @Patch(':id')
-  async partialUpdate(
-    @Body() body: UpdatePatchUserDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async partialUpdate(@Body() body: UpdatePatchUserDto, @ParamId() id: number) {
     return this.userService.partialUpdate(body, id);
   }
 
