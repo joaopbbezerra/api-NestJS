@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -33,7 +34,23 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    return this.jwtService.verify(token);
+    try {
+      return this.jwtService.verify(token, {
+        audience: 'Users',
+        issuer: 'login',
+      });
+    } catch (e) {
+      return new BadRequestException(e);
+    }
+  }
+
+  async isValidToken(token: string) {
+    try {
+      await this.validateToken(token);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   async login(email: string, password: string) {
