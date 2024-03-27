@@ -5,16 +5,31 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
+import { AuthRegisterDto } from './dto/auth-register.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
-  async createToken() {
-    //return this.jwtService.sign()
+  async createToken(user: User) {
+    return this.jwtService.sign(
+      {
+        sub: user.id,
+        name: user.name,
+        email: user.email,
+      },
+      {
+        expiresIn: '7 days',
+        issuer: 'login',
+        audience: 'Users',
+      },
+    );
   }
 
   async validateToken(token: string) {
@@ -33,7 +48,7 @@ export class AuthService {
       throw new UnauthorizedException('Email or password incorrect');
     }
 
-    return user;
+    return this.createToken(user);
   }
 
   async forget(email: string) {
@@ -58,7 +73,7 @@ export class AuthService {
 
     const id = 0;
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: {
         id,
       },
@@ -66,5 +81,12 @@ export class AuthService {
         password,
       },
     });
+
+    return this.createToken(user);
+  }
+
+  async register(data: AuthRegisterDto) {
+    const user = await this.userService.create(data);
+    return this.createToken(user);
   }
 }
