@@ -18,12 +18,13 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async createToken(user: User) {
+  createToken(user: User) {
     return this.jwtService.sign(
       {
         sub: user.id,
         name: user.name,
         email: user.email,
+        id: user.id,
       },
       {
         expiresIn: '7 days',
@@ -33,21 +34,20 @@ export class AuthService {
     );
   }
 
-  async validateToken(token: string) {
+  validateToken(token: string) {
     try {
       return this.jwtService.verify(token, {
         audience: 'Users',
         issuer: 'login',
       });
     } catch (e) {
-      return new BadRequestException(e);
+      throw new BadRequestException(e);
     }
   }
 
-  async isValidToken(token: string) {
+  isValidToken(token: string) {
     try {
-      await this.validateToken(token);
-      return true;
+      return !!this.validateToken(token);
     } catch (e) {
       return false;
     }
@@ -83,7 +83,7 @@ export class AuthService {
     return true;
   }
 
-  async reset(password: string, token: string) {
+  async reset(password: string) {
     //TODO: Check if token is valid
 
     //Get the id from the token
