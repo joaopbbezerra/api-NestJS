@@ -41,7 +41,7 @@ export class UserService {
   }
 
   async update(
-    { name, password, email, birthAt }: UpdatePutUserDto,
+    { name, password, email, birthAt, role }: UpdatePutUserDto,
     id: number,
   ) {
     return this.prisma.user.update({
@@ -50,6 +50,7 @@ export class UserService {
         password,
         email,
         birthAt: birthAt ? new Date(birthAt) : null,
+        role,
       },
       where: {
         id,
