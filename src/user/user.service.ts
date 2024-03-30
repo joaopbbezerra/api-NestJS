@@ -3,12 +3,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
   async create(data: CreateUserDto) {
     //We don't need the await when we are returning inside a Async function
+
+    //Creating the hash password - Hash is a one way function.
+    data.password = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
       data,
       //Select is the columns you want them to return
@@ -44,13 +48,15 @@ export class UserService {
     { name, password, email, birthAt, role }: UpdatePutUserDto,
     id: number,
   ) {
+    await this.exists(id);
+    password = await bcrypt.hash(password, 10);
     return this.prisma.user.update({
       data: {
         name,
         password,
         email,
         birthAt: birthAt ? new Date(birthAt) : null,
-        role,
+        role: role ? role : 1,
       },
       where: {
         id,
@@ -64,6 +70,9 @@ export class UserService {
         ...data,
         birthAt: null,
       };
+    await this.exists(id);
+    data.password = await bcrypt.hash(data.password, 10);
+
     return this.prisma.user.update({
       data,
       where: {
